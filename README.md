@@ -7,11 +7,11 @@ Spec projektu z ceza:
 
 Demon uruchamiany w sposób następujący
 
-# ./minicron <taskfile> <outfile>
+ ./minicron <taskfile> <outfile>
 
 Plik taskfile zawiera zadania zapisane w następującym formacie:
 
-# <hour>:<minutes>:<command>:<info>
+ <hour>:<minutes>:<command>:<info>
 
 Przy czym command jest dowolnym programem.
 Parametr info może mieć jedną z trzech wartości:
