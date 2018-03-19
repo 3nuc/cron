@@ -3,15 +3,15 @@ projekt systemy operacyjne
 
 Spec projektu z ceza:
 
-#3. Mini-cron
+# 3. Mini-cron
 
 Demon uruchamiany w sposób następujący
 
-./minicron <taskfile> <outfile>
+# ./minicron <taskfile> <outfile>
 
 Plik taskfile zawiera zadania zapisane w następującym formacie:
 
-<hour>:<minutes>:<command>:<info>
+# <hour>:<minutes>:<command>:<info>
 
 Przy czym command jest dowolnym programem.
 Parametr info może mieć jedną z trzech wartości:
@@ -28,6 +28,6 @@ dodatkowo:
 
     Obsługa potoków, w miejscu może wystąpić ciąg poleceń odseparowany znakami | (np ls -l | wc -l). W takiej sytuacji standardowe wyjście polecenia przesyłane jest do wejścia kolejnego (8p).
 
-Uwagi:
+# Uwagi:
 (a) Wszelkie operacje na plikach i procesach należy wykonywać przy pomocy API Linuksa a nie standardowej biblioteki języka C; wyjątki: funkcje grupy printf, przy parsowanie plików tekstowych można również wykorzytać standardową bibliotekę;
 (b) przerzucenie części zadań na shell systemowy zostanie potraktowane jako poważny błąd.
