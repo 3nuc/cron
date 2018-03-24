@@ -13,4 +13,4 @@ helpersDEBUG.o: src/helpers/helpers.c src/helpers/helpers.h
 	$(CC) src/helpers/helpers.c -c -o $@ -lm -g
 
 clean:
-	rm helpers.o helpersDEBUG.o minicron minicrond
+	rm -f helpers.o helpersDEBUG.o minicron minicrond
