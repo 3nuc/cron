@@ -7,7 +7,7 @@ Spec projektu z ceza:
 
 Demon uruchamiany w sposób następujący
 
- ./minicron <taskfile> <outfile>
+ ./minicron taskfile outfile
 
 Plik taskfile zawiera zadania zapisane w następującym formacie:
 
