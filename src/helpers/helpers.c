@@ -1,45 +1,91 @@
 #include "helpers.h"
-//time.h
-//stdlib.h
-
-
-
-
 
 int currentHour() {
-	struct tm *tm_struct = localtime(time(NULL));
+	time_t now = time(NULL);
+	struct tm *tm_struct = localtime(&now);
 	return tm_struct->tm_hour;
 }
 
 int currentMinute() {
-	struct tm *tm_struct = localtime(time(NULL));
+	time_t now = time(NULL);
+	struct tm *tm_struct = localtime(&now);
 	return tm_struct->tm_min;
 }
 
 int currentSecond() { //probably wont be needed but just in case
-	struct tm *tm_struct = localtime(time(NULL));
+	time_t now = time(NULL);
+	struct tm *tm_struct = localtime(&now);
 	return tm_struct->tm_sec;
 }
 
-long long str2int(char* str) {
-	return strtonum(str, 0, 100); //values are always between 0 and 100 when using this func 
+int str2int(char* str) { //probably works
+	int stringLength = strlen(str);
+	int multiply = pow(10.0,(float) stringLength-1);
+	int result;
+	
+	for(int i = 0; i < stringLength; i++) {
+		int translatedNumberFromASCII = str[i]-48;
+		int charIsDigit = translatedNumberFromASCII >= 0 && translatedNumberFromASCII <=9;
+		
+		assert(charIsDigit); //something something put errors here later
+		
+		result+=translatedNumberFromASCII*multiply;
+		multiply /= 10;
+	}
+
+	return result;
 }
 
-struct TASKFILE_LINE {
-	int hour;
-	int minute;
-	char* command;
-	int info;
-};
+char* strcut(char* start, char* end) {
+	const int stringLength = end-start;
+	char* tab = malloc(sizeof(char)*100); //memory leak call the cops
+	
+	for(int i = 0; i < stringLength ; i++) {
+		tab[i]=*(start+i);
+	}
+	tab[stringLength+1]='\0';
+
+	//printf("%s",tab);
+
+	return tab;
+}
 
 struct TASKFILE_LINE parseTaskfileLine(char* line) {
 	
-	struct TASKFILE_LINE result;	
-	const char splitOn[2] = ":";
-	result.hour=str2int(strtok(line, splitOn));
-	result.minute=str2int(strtok(line,splitOn));
-	result.command=strtok(line,splitOn);
-	result.info=str2int(strtok(line));
+	const int stringLength = strlen(line);
+	int colonPositionsInString[] = {-1, -1, -1};
+	int colonCounter=0;
+
+	for(int i = 0; i < 3; i++) {
+		if(line[i] == ':') {
+			colonPositionsInString[colonCounter] = i;
+			
+			colonCounter++;
+		}
+
+		assert(colonCounter<=3); //cant have more than 3 colons TODO: error handling, later (actually never lmao)
+		
+	}
+
+	char* hourStart = line;
+	char* hourEnd= line+colonPositionsInString[0]-1;
+
+	char* minuteStart = hourEnd+2; //+2 because we're skipping the colon
+	char* minuteEnd= line+colonPositionsInString[1]-1;
+
+	char* commandStart = minuteEnd+2;
+	char* commandEnd= line+colonPositionsInString[2]-1;
+
+	char* infoStart = commandEnd+2; //info should only be a single digit, but later cron commands could handle errors if you eg. pass two digits
+	char* infoEnd= line+stringLength;
+
+
+
+	struct TASKFILE_LINE result;
+	result.hour=str2int(strcut(hourStart, hourEnd));
+	result.minute=str2int(strcut(minuteStart, minuteEnd));
+	result.command=strcut(commandStart,commandEnd);
+	result.info=str2int(strcut(infoStart,infoEnd));
 
 	return result;
 		
