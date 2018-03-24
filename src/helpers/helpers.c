@@ -5,11 +5,6 @@
 
 
 
-char *currentTime() {
-	char * currtimestr = ctime(time(NULL)
-	currtimestr[strlen(currtimestr)-1]='/0';
-	return currtimestr;
-}
 
 int currentHour() {
 	struct tm *tm_struct = localtime(time(NULL));
@@ -37,17 +32,17 @@ struct TASKFILE_LINE {
 	int info;
 };
 
-TASKFILE_LINE parseTaskfileLine(char* line) {
-	TASKFILE_LINE result;	
+struct TASKFILE_LINE parseTaskfileLine(char* line) {
+	
+	struct TASKFILE_LINE result;	
 	const char splitOn[2] = ":";
-	result->hour=str2int(strtok(line, splitOn));
-	result->minute=str2int(strtok(line,splitOn));
-	result->command=strtok(line,splitOn);
-	result->info=str2int(strtok(line);
+	result.hour=str2int(strtok(line, splitOn));
+	result.minute=str2int(strtok(line,splitOn));
+	result.command=strtok(line,splitOn);
+	result.info=str2int(strtok(line));
 
 	return result;
 		
 }
 void generateTestingFile() { //generates taskfile.txt with random commands 1 minute, 2 minutes and 3 minutes from now
-	const currentTime = currentTime(); 	
 }
