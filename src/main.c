@@ -1,18 +1,12 @@
-#include "helpers.h"
+#include "taskfileparse.h"
 #include <stdio.h>
 
 int main() {
 	
-	//parser
-	char tab[]="25:56:command:0";
-	struct TASKFILE_LINE line = parseTaskfileLine(tab);
-	printf("%d %d %s %d \n", line.hour, line.minute, line.command, line.info);
+	char *tasks = _getTaskfileContents("taskfile.test");
+//	printf("%s",tasks);
+	char **tasktable=_convertLineStringIntoLineArray(tasks);
 
-
-	//strcut
-	//char tab[] = "XD";
-	//char* result = strcut(tab, tab+3);
-	//printf("%s", result);
-
+	printf("%s",tasktable[0]);
 	return 0;
 }

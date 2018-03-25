@@ -21,21 +21,21 @@ struct TASKFILE_LINE *getTaskArray(char** linesFromTaskfile) {
 }
 
 
-char** _getTaskfileContents(char* pathToTaskfile) {
+char* _getTaskfileContents(char* pathToTaskfile) {
 	int fileDescriptor = open(pathToTaskfile, O_RDONLY);
 
 	//add error handling later (for opening the file)
 
 	
 	int fileLengthInBytes=lseek(fileDescriptor, 0L, SEEK_END); //go to end of file
-	
-	rewind(fileDescriptor); //cursor back to beginning of file
+	lseek(fileDescriptor,0L,SEEK_SET); //cursor back to beginning of file
 
 	char *fileContents = malloc(fileLengthInBytes+1); //memory leak call the cops
-	read(fileContents, 0, fileLengthInBytes); //no idea what the 1,f is
+	read(fileDescriptor, fileContents, fileLengthInBytes); //no idea what the 1,f is
 	close(fileDescriptor);
 
-	fileContents[fileLengthInBytes]=0;
+//	fileContents[fileLengthInBytes-1]='/0';
+
 
 	return fileContents; 
 	
@@ -43,12 +43,11 @@ char** _getTaskfileContents(char* pathToTaskfile) {
 }
 
 char** _convertLineStringIntoLineArray(char* reallyLongString) { //splits a long string by \n
-	char* result[MAX_CRON_TASKS];
+	char result[MAX_CRON_TASKS][100];
 
-		
 	
 	for(int i = 0; i < MAX_CRON_TASKS; i++) {
-		result[i]=NULL;
+		strcpy(result[i], "");
 	}
 
 
