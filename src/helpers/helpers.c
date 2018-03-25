@@ -21,7 +21,7 @@ int currentSecond() { //probably wont be needed but just in case
 int str2int(char* str) { //probably works
 	int stringLength = strlen(str);
 	int multiply = pow(10.0,(float) stringLength-1);
-	int result;
+	int result=0;
 	
 	for(int i = 0; i < stringLength; i++) {
 		int translatedNumberFromASCII = str[i]-48;
@@ -29,6 +29,7 @@ int str2int(char* str) { //probably works
 		
 		assert(charIsDigit); //something something put errors here later
 		
+		//printf("Adding %d\n", translatedNumberFromASCII*multiply);
 		result+=translatedNumberFromASCII*multiply;
 		multiply /= 10;
 	}
@@ -40,13 +41,14 @@ char* strcut(char* start, char* end) {
 	const int stringLength = end-start;
 	char* tab = malloc(sizeof(char)*100); //memory leak call the cops
 	
-	for(int i = 0; i < stringLength ; i++) {
+	for(int i = 0; i < stringLength; i++) {
 		tab[i]=*(start+i);
 	}
 	tab[stringLength+1]='\0';
 
 	//printf("%s",tab);
 
+	//printf("strcut: %s\n", tab);
 	return tab;
 }
 
@@ -56,7 +58,7 @@ struct TASKFILE_LINE parseTaskfileLine(char* line) {
 	int colonPositionsInString[] = {-1, -1, -1};
 	int colonCounter=0;
 
-	for(int i = 0; i < 3; i++) {
+	for(int i = 0; i < stringLength; i++) {
 		if(line[i] == ':') {
 			colonPositionsInString[colonCounter] = i;
 			
@@ -67,16 +69,17 @@ struct TASKFILE_LINE parseTaskfileLine(char* line) {
 		
 	}
 
+	//printf("%d %d %d", colonPositionsInString[0], colonPositionsInString[1],colonPositionsInString[2]);
 	char* hourStart = line;
-	char* hourEnd= line+colonPositionsInString[0]-1;
+	char* hourEnd= line+colonPositionsInString[0];
 
-	char* minuteStart = hourEnd+2; //+2 because we're skipping the colon
-	char* minuteEnd= line+colonPositionsInString[1]-1;
+	char* minuteStart = hourEnd+1; //+1 because we're skipping the colon
+	char* minuteEnd= line+colonPositionsInString[1];
 
-	char* commandStart = minuteEnd+2;
-	char* commandEnd= line+colonPositionsInString[2]-1;
+	char* commandStart = minuteEnd+1;
+	char* commandEnd= line+colonPositionsInString[2];
 
-	char* infoStart = commandEnd+2; //info should only be a single digit, but later cron commands could handle errors if you eg. pass two digits
+	char* infoStart = commandEnd+1; //info should only be a single digit, but later cron commands could handle errors if you eg. pass two digits
 	char* infoEnd= line+stringLength;
 
 

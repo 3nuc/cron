@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <math.h>
 #include <assert.h>
+#include <string.h>
+#include <stdio.h>
 
 char *currentTime();
 
