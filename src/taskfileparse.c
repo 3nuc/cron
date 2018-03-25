@@ -1,17 +1,20 @@
 #define MAX_CRON_TASKS 100 //how many lines there can be in the taskfile
-
+#include "taskfileparse.h"
 struct TASKFILE_LINE *getTaskArray(char** linesFromTaskfile) {
 	struct TASKFILE_LINE result[MAX_CRON_TASKS];
+	
+	static const struct TASKFILE_LINE nullLine;
+	
 	for(int i = 0; i < MAX_CRON_TASKS; i++) {
-		result[i]=NULL;
+		result[i]=nullLine;
 	}
 	
-	int numberOfLines = sizeof(linesFromTaskfile)/sizeof(char*MAX_CRON_TASKS);
+	int numberOfLines = sizeof(linesFromTaskfile)/sizeof(char)*MAX_CRON_TASKS;
 
-	bool parsingLessLinesThanMAXCRONTASKSAllows=numberOfLines<MAX_CRON_TASKS;
+	int parsingLessLinesThanMAXCRONTASKSAllows=numberOfLines<MAX_CRON_TASKS;
 	assert(parsingLessLinesThanMAXCRONTASKSAllows);
 	
-	for(int i = 0; i < numberOfLines) {
+	for(int i = 0; i < numberOfLines;i++) {
 		result[i]=parseTaskfileLine(linesFromTaskfile[i]);
 	}
 	return result;
@@ -23,14 +26,14 @@ char** _getTaskfileContents(char* pathToTaskfile) {
 
 	//add error handling later (for opening the file)
 
-	fseek(fileDescriptor, 0L, SEEK_END); //go to end of file
-	int fileLengthInBytes=ftell(fileDescriptor);
+	
+	int fileLengthInBytes=lseek(fileDescriptor, 0L, SEEK_END); //go to end of file
 	
 	rewind(fileDescriptor); //cursor back to beginning of file
 
 	char *fileContents = malloc(fileLengthInBytes+1); //memory leak call the cops
-	fread(fileContents, fileLengthInBytes, 1, f); //no idea what the 1,f is
-	fclose(fileDescriptor);
+	read(fileContents, 0, fileLengthInBytes); //no idea what the 1,f is
+	close(fileDescriptor);
 
 	fileContents[fileLengthInBytes]=0;
 
@@ -42,6 +45,8 @@ char** _getTaskfileContents(char* pathToTaskfile) {
 char** _convertLineStringIntoLineArray(char* reallyLongString) { //splits a long string by \n
 	char* result[MAX_CRON_TASKS];
 
+		
+	
 	for(int i = 0; i < MAX_CRON_TASKS; i++) {
 		result[i]=NULL;
 	}
