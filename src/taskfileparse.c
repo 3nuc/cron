@@ -76,7 +76,7 @@ char** _convertLineStringIntoLineArray(char* reallyLongString) { //splits a long
 	int lineCount = 0;
 	int characterCount = 0;
 
-	printf("\nconv strlen %d\n", stringLength);
+	//printf("\nconv strlen %d\n", stringLength);
 	
 	for(int i = 0; i < stringLength; i++) {
 		//printf("conv %d\n", i);
