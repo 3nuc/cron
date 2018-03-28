@@ -1,15 +1,18 @@
 #define MAX_CRON_TASKS 100 //how many lines there can be in the taskfile
 #include "taskfileparse.h"
-struct TASKFILE_LINE *getTaskArray(char** linesFromTaskfile) {
-	struct TASKFILE_LINE result[MAX_CRON_TASKS];
+
+
+struct TASKFILE_LINE *getTaskArray(char* pathToTaskfile) {
+	struct TASKFILE_LINE *result;
 	
-	static const struct TASKFILE_LINE nullLine;
+	char* taskfileContentsAsOneString = _getTaskfileContentsAsLineString(pathToTaskfile);
+	char** linesFromTaskfile = _convertLineStringIntoLineArray(taskfileContentsAsOneString);
 	
-	for(int i = 0; i < MAX_CRON_TASKS; i++) {
-		result[i]=nullLine;
-	}
+	free(taskfileContentsAsOneString);
 	
-	int numberOfLines = sizeof(linesFromTaskfile)/sizeof(char)*MAX_CRON_TASKS;
+	int numberOfLines = sizeof(linesFromTaskfile)/sizeof(char*)+1;
+	
+	result = malloc(numberOfLines * sizeof(struct TASKFILE_LINE));
 
 	int parsingLessLinesThanMAXCRONTASKSAllows=numberOfLines<MAX_CRON_TASKS;
 	assert(parsingLessLinesThanMAXCRONTASKSAllows);
@@ -21,7 +24,7 @@ struct TASKFILE_LINE *getTaskArray(char** linesFromTaskfile) {
 }
 
 
-char* _getTaskfileContents(char* pathToTaskfile) {
+char* _getTaskfileContentsAsLineString(char* pathToTaskfile) {
 	int fileDescriptor = open(pathToTaskfile, O_RDONLY);
 
 	//add error handling later (for opening the file)
@@ -68,33 +71,28 @@ char** _convertLineStringIntoLineArray(char* reallyLongString) { //splits a long
 
 	const int stringLength = strlen(reallyLongString);
 
-	/*int numberOfLines = 1;
-	for(int i = 0; i<stringLength; i++) 
-		if(reallyLongString[i]=='\n') 
-			numberOfLines++;*/
-
 	int lineCount = 0;
 	int characterCount = 0;
 
-	//printf("\nconv strlen %d\n", stringLength);
+	printf("\nconv strlen %d\n", stringLength);
 	
 	for(int i = 0; i < stringLength; i++) {
-		//printf("conv %d\n", i);
+		printf("conv %d\n", i);
 		char currentCharacter = reallyLongString[i];
 		if(currentCharacter=='\n') {
-			//printf("	conv %d found a newline lc: %d char: %c \n", i, lineCount,currentCharacter);
+			printf("	conv %d found a newline lc: %d char: %c \n", i, lineCount,currentCharacter);
 			result[lineCount][characterCount]='\0';
 			lineCount++;
 			characterCount=0;
 		}
 		else {
 			result[lineCount][characterCount] = currentCharacter;
-			//printf("	conv %d lc: %d char: %c \n", i, lineCount,currentCharacter);
+			printf("	conv %d lc: %d char: %c \n", i, lineCount,currentCharacter);
 			characterCount++;
 		}
 	}
 	
-	result[lineCount][characterCount+1]='\0';
+	result[lineCount][characterCount-1]='\0';
 	
 	return result;
 }

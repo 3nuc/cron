@@ -4,6 +4,6 @@
 #include <unistd.h>
 #include "helpers.h"
 
-struct TASKFILE_LINE *getTaskArray(char** linesFromTaskfile);
-char* _getTaskfileContents(char* pathToTaskfile);
+struct TASKFILE_LINE *getTaskArray(char* pathToTaskfile);
+char* _getTaskfileContentsAsLineString(char* pathToTaskfile);
 char** _convertLineStringIntoLineArray(char* reallyLongString);
