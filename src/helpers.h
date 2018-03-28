@@ -5,7 +5,6 @@
 #include <string.h>
 #include <stdio.h>
 
-char *currentTime();
 
 struct TASKFILE_LINE {
 	int hour;
@@ -24,4 +23,4 @@ int str2int(char* str);
 
 struct TASKFILE_LINE parseTaskfileLine(char* line);
 
-void generateTestingFile();
+void printTask(struct TASKFILE_LINE task);

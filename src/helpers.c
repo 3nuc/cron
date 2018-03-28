@@ -27,7 +27,7 @@ int str2int(char* str) { //probably works
 		int translatedNumberFromASCII = str[i]-48;
 		int charIsDigit = translatedNumberFromASCII >= 0 && translatedNumberFromASCII <=9;
 		
-		assert(charIsDigit); //something something put errors here later
+		//assert(charIsDigit); //something something put errors here later
 		
 		//printf("Adding %d\n", translatedNumberFromASCII*multiply);
 		result+=translatedNumberFromASCII*multiply;
@@ -93,5 +93,7 @@ struct TASKFILE_LINE parseTaskfileLine(char* line) {
 	return result;
 		
 }
-void generateTestingFile() { //generates taskfile.txt with random commands 1 minute, 2 minutes and 3 minutes from now
+
+void printTask(struct TASKFILE_LINE task) {
+	printf("%d %d %s %d\n", task.hour, task.minute, task.command, task.info);
 }
