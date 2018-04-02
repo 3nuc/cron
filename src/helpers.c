@@ -94,6 +94,77 @@ struct TASKFILE_LINE parseTaskfileLine(char* line) {
 		
 }
 
+int stringContainsCharacter(char* string, char character) {
+	int stringLength = sizeof(string)+1;
+
+	for(int i = 0; i < stringLength; i++)
+		if(string[i]==character) 
+			return 1;
+	
+	return 0;
+}
+
+char** splitByPipe(char* string, int* numberOfCommandsArg) {
+	
+	//memory alloc stuff
+	int numberOfPipes = 0;
+	
+	for(int i = 0; i < sizeof(string)+1;i++)
+		if(string[i]=='|')
+			numberOfPipes++;
+
+	char** result = malloc(sizeof(char*)*(numberOfPipes+1));
+
+	for(int i = 0; i < numberOfPipes+1; i++) {
+		result[i]=malloc(100);
+	}
+	//end of memory alloc stuff
+	
+	int lineCount = 0;
+	int characterCount = 0;
+	int stringLength=strlen(string);
+
+	//printf("\nconv strlen %d\n", stringLength);
+	
+	for(int i = 0; i < stringLength; i++) {
+//	printf("conv %d\n", i);
+		char currentCharacter = string[i];
+		if(currentCharacter=='|') {
+//			printf("	conv %d found a newline lc: %d char: %c \n", i, lineCount,currentCharacter);
+			result[lineCount][characterCount]='\0';
+			lineCount++;
+			characterCount=0;
+		}
+		else {
+			result[lineCount][characterCount] = currentCharacter;
+//			printf("	conv %d lc: %d char: %c \n", i, lineCount,currentCharacter);
+			characterCount++;
+		}
+	}
+	
+	result[lineCount][characterCount-1]='\0';
+	
+	*numberOfCommandsArg=numberOfPipes+1;
+	return result;	
+}
+
+
 void printTask(struct TASKFILE_LINE task) {
 	printf("%d %d %s %d\n", task.hour, task.minute, task.command, task.info);
+}
+
+int checkArgs(int argc, char* argv[]) {
+	if(argc > 3) { 
+		errno=E2BIG;
+		perror("Too many arguments (2 needed)\n");
+		return errno;
+	}
+
+	else if (argc<3) {
+		errno=0; //no error code for too few arguments btw
+		fprintf(stderr, "Too few arguments (2 needed)\n");
+		return errno;
+	}
+
+	return 0;
 }
