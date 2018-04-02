@@ -1,10 +1,10 @@
 CC = gcc
 objects = helpers.o taskfileparse.o main.o
-flags = -g -lm
+CFLAGS = -Wall -g -lm
 name = minicron
 
 $(name): $(objects)
-	$(CC) -o $@ $(objects) $(flags)
+	$(CC) -o $@ $(objects) $(CFLAGS)
 
 main.o: main.c
 
