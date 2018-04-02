@@ -74,20 +74,20 @@ char** _convertLineStringIntoLineArray(char* reallyLongString) { //splits a long
 	int lineCount = 0;
 	int characterCount = 0;
 
-	printf("\nconv strlen %d\n", stringLength);
+	//printf("\nconv strlen %d\n", stringLength);
 	
 	for(int i = 0; i < stringLength; i++) {
-		printf("conv %d\n", i);
+		//printf("conv %d\n", i);
 		char currentCharacter = reallyLongString[i];
 		if(currentCharacter=='\n') {
-			printf("	conv %d found a newline lc: %d char: %c \n", i, lineCount,currentCharacter);
+			//printf("	conv %d found a newline lc: %d char: %c \n", i, lineCount,currentCharacter);
 			result[lineCount][characterCount]='\0';
 			lineCount++;
 			characterCount=0;
 		}
 		else {
 			result[lineCount][characterCount] = currentCharacter;
-			printf("	conv %d lc: %d char: %c \n", i, lineCount,currentCharacter);
+			//printf("	conv %d lc: %d char: %c \n", i, lineCount,currentCharacter);
 			characterCount++;
 		}
 	}
