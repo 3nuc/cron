@@ -7,3 +7,4 @@
 struct TASKFILE_LINE *getTaskArray(char* pathToTaskfile, int* lineCountArg);
 char* _getTaskfileContentsAsLineString(char* pathToTaskfile);
 char** _convertLineStringIntoLineArray(char* reallyLongString, int* lineCountArg );
+int _compareForQsort(const void* a, const void*  b);

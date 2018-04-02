@@ -4,7 +4,7 @@
 
 struct TASKFILE_LINE *getTaskArray(char* pathToTaskfile, int* lineCountArg) {
 	struct TASKFILE_LINE *result;
-	int* linecountptr;
+	int* linecountptr=malloc(sizeof(*linecountptr));
 	
 	char* taskfileContentsAsOneString = _getTaskfileContentsAsLineString(pathToTaskfile);
 	char** linesFromTaskfile = _convertLineStringIntoLineArray(taskfileContentsAsOneString,linecountptr);
@@ -22,6 +22,8 @@ struct TASKFILE_LINE *getTaskArray(char* pathToTaskfile, int* lineCountArg) {
 		result[i]=parseTaskfileLine(linesFromTaskfile[i]);
 	}
 	*lineCountArg=numberOfLines;
+	
+	qsort(result,numberOfLines,sizeof(struct TASKFILE_LINE), _compareForQsort);
 	return result;
 }
 
@@ -93,3 +95,21 @@ char** _convertLineStringIntoLineArray(char* reallyLongString, int* lineCountArg
 	*lineCountArg=lineCount;
 	return result;
 }
+
+int _compareForQsort(const void * a, const void *  b) {
+	struct TASKFILE_LINE *elemA = (struct TASKFILE_LINE*) a;
+	struct TASKFILE_LINE *elemB = (struct TASKFILE_LINE*) b;
+	int ahour=elemA->hour;
+	int bhour=elemB->hour;
+	int aminute=elemA->minute;
+	int bminute=elemB->minute;
+	
+	if(ahour>bhour) return 1;
+	else if(ahour<bhour) return -1;
+	
+	else
+		if(aminute>bminute) return 1;
+		else if(aminute<bminute) return -1;
+		else return 0;
+}
+
