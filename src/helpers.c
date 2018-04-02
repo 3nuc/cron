@@ -21,9 +21,9 @@ int currentSecond() { //probably wont be needed but just in case
 int str2int(char* str) { //probably works
 	int stringLength = strlen(str);
 	int multiply = pow(10.0,(float) stringLength-1);
-	int result=0;
+	int result=0, i;
 	
-	for(int i = 0; i < stringLength; i++) {
+	for(i = 0; i < stringLength; i++) {
 		int translatedNumberFromASCII = str[i]-48;
 		int charIsDigit = translatedNumberFromASCII >= 0 && translatedNumberFromASCII <=9;
 		
@@ -40,8 +40,9 @@ int str2int(char* str) { //probably works
 char* strcut(char* start, char* end) {
 	const int stringLength = end-start;
 	char* tab = malloc(sizeof(char)*100); //memory leak call the cops
-	
-	for(int i = 0; i < stringLength; i++) {
+
+	int i;
+	for(i = 0; i < stringLength; i++) {
 		tab[i]=*(start+i);
 	}
 	tab[stringLength+1]='\0';
@@ -56,9 +57,9 @@ struct TASKFILE_LINE parseTaskfileLine(char* line) {
 	
 	const int stringLength = strlen(line);
 	int colonPositionsInString[] = {-1, -1, -1};
-	int colonCounter=0;
+	int colonCounter=0, i;
 
-	for(int i = 0; i < stringLength; i++) {
+	for(i = 0; i < stringLength; i++) {
 		if(line[i] == ':') {
 			colonPositionsInString[colonCounter] = i;
 			

@@ -1,5 +1,5 @@
 CC = gcc
-objects = helpers.o taskfileparse.o main.o
+objects = helpers.o taskfileparse.o main.o logger.o
 flags = -g -lm
 name = minicron
 
@@ -11,6 +11,8 @@ main.o: main.c
 helpers.o: helpers.h helpers.c
 
 taskfileparse.o: taskfileparse.h taskfileparse.c
+
+logger.o: logger.h logger.c
 
 clean:
 	rm -f $(objects)

@@ -17,7 +17,8 @@ struct TASKFILE_LINE *getTaskArray(char* pathToTaskfile) {
 	int parsingLessLinesThanMAXCRONTASKSAllows=numberOfLines<MAX_CRON_TASKS;
 	assert(parsingLessLinesThanMAXCRONTASKSAllows);
 	
-	for(int i = 0; i < numberOfLines;i++) {
+	int i;
+	for(i = 0; i < numberOfLines;i++) {
 		result[i]=parseTaskfileLine(linesFromTaskfile[i]);
 	}
 	return result;
@@ -51,12 +52,13 @@ char** _convertLineStringIntoLineArray(char* reallyLongString) { //splits a long
 	const int maxStringSize=100;
 	
 	char** result;
+	int i;
 	
 	if (( result = malloc( MAX_CRON_TASKS*sizeof( char* ))) == NULL ) {
 		//error with memory alloc
 	}
 	
-	for (int i = 0; i < MAX_CRON_TASKS; i++) {
+	for (i = 0; i < MAX_CRON_TASKS; i++) {
 		if ((result[i]=malloc(100))==NULL) {
 			//error with memory alloc
 		}
@@ -64,7 +66,7 @@ char** _convertLineStringIntoLineArray(char* reallyLongString) { //splits a long
 	
 	//basically, char** result now is char result[MAX_CRON_TASKS][maxStringSize];
 	
-	for(int i = 0; i < MAX_CRON_TASKS; i++) {
+	for(i = 0; i < MAX_CRON_TASKS; i++) {
 		strcpy(result[i], "");
 	}
 
@@ -76,7 +78,7 @@ char** _convertLineStringIntoLineArray(char* reallyLongString) { //splits a long
 
 	printf("\nconv strlen %d\n", stringLength);
 	
-	for(int i = 0; i < stringLength; i++) {
+	for(i = 0; i < stringLength; i++) {
 		printf("conv %d\n", i);
 		char currentCharacter = reallyLongString[i];
 		if(currentCharacter=='\n') {

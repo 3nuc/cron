@@ -22,7 +22,8 @@ int main(int argc, char * argv[]) {
 	struct TASKFILE_LINE *tasks = getTaskArray(pathToTaskfile);
 	const int numberOfTasks = sizeof(tasks)/sizeof(char*)+1;
 	
-	for(int i = 0; i<numberOfTasks; i++)
+	int i;
+	for(i = 0; i<numberOfTasks; i++)
 		printTask(tasks[i]);
 	
 	
