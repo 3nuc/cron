@@ -2,31 +2,32 @@
 #include "taskfileparse.h"
 
 
-struct TASKFILE_LINE *getTaskArray(char* pathToTaskfile) {
+struct TASKFILE_LINE *getTaskArray(char* pathToTaskfile, int* lineCountArg) {
 	struct TASKFILE_LINE *result;
+	int* linecountptr;
 	
 	char* taskfileContentsAsOneString = _getTaskfileContentsAsLineString(pathToTaskfile);
-	char** linesFromTaskfile = _convertLineStringIntoLineArray(taskfileContentsAsOneString);
+	char** linesFromTaskfile = _convertLineStringIntoLineArray(taskfileContentsAsOneString,linecountptr);
 	
 	free(taskfileContentsAsOneString);
 	
-	int numberOfLines = sizeof(linesFromTaskfile)/sizeof(char*)+1;
+	int numberOfLines = *linecountptr;
 	
 	result = malloc(numberOfLines * sizeof(struct TASKFILE_LINE));
 
 	int parsingLessLinesThanMAXCRONTASKSAllows=numberOfLines<MAX_CRON_TASKS;
 	assert(parsingLessLinesThanMAXCRONTASKSAllows);
 	
-	for(int i = 0; i < numberOfLines;i++) {
+	for(int i = 0; i <= numberOfLines;i++) {
 		result[i]=parseTaskfileLine(linesFromTaskfile[i]);
 	}
+	*lineCountArg=numberOfLines;
 	return result;
 }
 
 
 char* _getTaskfileContentsAsLineString(char* pathToTaskfile) {
 	int fileDescriptor = open(pathToTaskfile, O_RDONLY);
-
 	//add error handling later (for opening the file)
 
 	
@@ -37,29 +38,23 @@ char* _getTaskfileContentsAsLineString(char* pathToTaskfile) {
 	read(fileDescriptor, fileContents, fileLengthInBytes);
 	close(fileDescriptor);
 
-//	fileContents[fileLengthInBytes-1]='/0';
 
 
+	//printf("%s", fileContents);
 	return fileContents; 
 	
 	
 }
 
-char** _convertLineStringIntoLineArray(char* reallyLongString) { //splits a long string by \n
+char** _convertLineStringIntoLineArray(char* reallyLongString, int* lineCountArg) { //splits a long string by \n
 	
 	
 	const int maxStringSize=100;
 	
-	char** result;
-	
-	if (( result = malloc( MAX_CRON_TASKS*sizeof( char* ))) == NULL ) {
-		//error with memory alloc
-	}
+	char** result=malloc( MAX_CRON_TASKS*sizeof( char* ));
 	
 	for (int i = 0; i < MAX_CRON_TASKS; i++) {
-		if ((result[i]=malloc(100))==NULL) {
-			//error with memory alloc
-		}
+		result[i]=malloc(maxStringSize);
 	}
 	
 	//basically, char** result now is char result[MAX_CRON_TASKS][maxStringSize];
@@ -77,22 +72,24 @@ char** _convertLineStringIntoLineArray(char* reallyLongString) { //splits a long
 	//printf("\nconv strlen %d\n", stringLength);
 	
 	for(int i = 0; i < stringLength; i++) {
-		//printf("conv %d\n", i);
+	//	printf("conv %d\n", i);
 		char currentCharacter = reallyLongString[i];
 		if(currentCharacter=='\n') {
-			//printf("	conv %d found a newline lc: %d char: %c \n", i, lineCount,currentCharacter);
+	//		printf("	found a newline lc: %d char: %c \n", lineCount,currentCharacter);
 			result[lineCount][characterCount]='\0';
 			lineCount++;
 			characterCount=0;
 		}
 		else {
 			result[lineCount][characterCount] = currentCharacter;
-			//printf("	conv %d lc: %d char: %c \n", i, lineCount,currentCharacter);
+	//		printf("	lc: %d char: %c \n", lineCount,currentCharacter);
 			characterCount++;
 		}
 	}
 	
 	result[lineCount][characterCount-1]='\0';
 	
+	
+	*lineCountArg=lineCount;
 	return result;
 }
