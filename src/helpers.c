@@ -25,7 +25,7 @@ int str2int(char* str) { //probably works
 	
 	for(i = 0; i < stringLength; i++) {
 		int translatedNumberFromASCII = str[i]-48;
-		int charIsDigit = translatedNumberFromASCII >= 0 && translatedNumberFromASCII <=9;
+		//int charIsDigit = translatedNumberFromASCII >= 0 && translatedNumberFromASCII <=9;
 		
 		//assert(charIsDigit); //something something put errors here later
 		

@@ -7,7 +7,7 @@ struct TASKFILE_LINE *getTaskArray(char* pathToTaskfile, int* lineCountArg) {
 	int* linecountptr;
 	
 	char* taskfileContentsAsOneString = _getTaskfileContentsAsLineString(pathToTaskfile);
-	char** linesFromTaskfile = _convertLineStringIntoLineArray(taskfileContentsAsOneString,linecountptr);
+	char** linesFromTaskfile = _convertLineStringIntoLineArray(taskfileContentsAsOneString, linecountptr);
 	
 	free(taskfileContentsAsOneString);
 	

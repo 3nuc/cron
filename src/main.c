@@ -1,4 +1,6 @@
 #include "taskfileparse.h"
+#include "logger.h"
+#include "daemon.h"
 #include <stdio.h>
 
 void handleCommand(char* commandString) {
@@ -22,17 +24,27 @@ void handleCommand(char* commandString) {
 }
 
 int main(int argc, char* argv[]) {
-	int argsBad = checkArgs(argc, argv);
-	if(argsBad) return argsBad;
-		
-	const char* pathToTaskfile = argv[1];
-	const char* pathToOutfile = argv[2];
 
-	int* numberOfTasks=malloc(sizeof(*numberOfTasks));
-	struct TASKFILE_LINE *tasks = getTaskArray(pathToTaskfile,numberOfTasks);
+	forkDaemon();
 
-	for(int i = 0; i < *numberOfTasks; i++) {
-		handleCommand(tasks[i].command);
-	}
+	//printf("FeelsGoodMan with my pid %d", getpid());
+	executeCommand("woohoo");
+
+	closeLogging();
+
 	return 0;
+
+	// int argsBad = checkArgs(argc, argv);
+	// if(argsBad) return argsBad;
+		
+	// const char* pathToTaskfile = argv[1];
+	// const char* pathToOutfile = argv[2];
+
+	// int* numberOfTasks=malloc(sizeof(*numberOfTasks));
+	// struct TASKFILE_LINE *tasks = getTaskArray(pathToTaskfile,numberOfTasks);
+
+	// for(int i = 0; i < *numberOfTasks; i++) {
+	// 	handleCommand(tasks[i].command);
+	// }
+	// return 0;
 }
