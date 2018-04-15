@@ -35,23 +35,47 @@ void forkDaemon() {
 	syslog(LOG_NOTICE, "Mini-cron properly forked");
 }
 
-void executeCommand(char* command) {
+void executeCommand(char* command, int outtype) {
 	pid_t pid;
+	int fd[2];
+	char buff[4096];
+
+	if(pipe(fd) < 0) {
+		syslog(LOG_ERR, "Failed creating a pipe");
+		exit(EXIT_FAILURE);
+	}
+
 	pid = fork();
 
 	if( pid < 0 ) {
 		syslog(LOG_ERR, "Failed creating a process for the command %s", command);
 		exit(EXIT_FAILURE);
 	}
-	if( pid > 0 ) {
-		exit(EXIT_SUCCESS);
+	if( pid > 0 ) {	// parent
+
+		close(fd[1]);
+
+		int out = open("/home/maxim/studia/out", O_WRONLY | O_APPEND);
+		int nbytes = read(fd[0], buff, sizeof(buff));
+		write(out, buff, nbytes);
+
+		close(out);
+		close(fd[0]);
+		waitpid(pid, 0, 0);
 	}
+	else {	//child
 
-	char* test[2];
-	test[0] = "/bin/mkdir";
-	test[1] = "/home/maxim/pls";
-	test[2] = 0;
+		close(fd[0]);
 
-	syslog(LOG_NOTICE, "Forked command %s", command);
-	execv("/bin/mkdir", test);
+		dup2(fd[1], STDOUT_FILENO);
+
+		char* test[2];
+		test[0] = "cat";
+		test[1] = "/home/maxim/studia/cron/README.md";
+		test[2] = 0;
+
+		syslog(LOG_NOTICE, "Forked command %s", test[0]);
+		execv("/bin/cat", test);
+
+	}
 }
