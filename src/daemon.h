@@ -6,4 +6,4 @@
 #include <sys/stat.h>
 
 void forkDaemon();
-void executeCommand(char* command, int outtype);
+void executeCommand(char** command, int outtype);

@@ -110,7 +110,7 @@ char** splitByPipe(char* string, int* numberOfCommandsArg) {
 	//memory alloc stuff
 	int numberOfPipes = 0;
 	
-	for(int i = 0; i < sizeof(string)+1;i++)
+	for(int i = 0; i < strlen(string);i++)
 		if(string[i]=='|')
 			numberOfPipes++;
 

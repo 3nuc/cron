@@ -35,13 +35,13 @@ void forkDaemon() {
 	syslog(LOG_NOTICE, "Mini-cron properly forked");
 }
 
-void executeCommand(char* command, int outtype) {
+void executeCommand(char** command, int outtype) {
 	pid_t pid;
 	int fd[2];
 	char buff[4096];
 
 	if(pipe(fd) < 0) {
-		syslog(LOG_ERR, "Failed creating a pipe");
+		syslog(LOG_ERR, "Failed creating a pipe for %s", command);
 		exit(EXIT_FAILURE);
 	}
 
@@ -68,14 +68,15 @@ void executeCommand(char* command, int outtype) {
 		close(fd[0]);
 
 		dup2(fd[1], STDOUT_FILENO);
+		syslog(LOG_NOTICE, "Forked command %s", command[0]);
 
 		char* test[2];
 		test[0] = "cat";
 		test[1] = "/home/maxim/studia/cron/README.md";
 		test[2] = 0;
+		
+		execv(command[0], command);
 
-		syslog(LOG_NOTICE, "Forked command %s", test[0]);
-		execv("/bin/cat", test);
-
+		close(fd[1]);
 	}
 }
