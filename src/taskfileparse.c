@@ -61,7 +61,7 @@ char** _convertLineStringIntoLineArray(char* reallyLongString, int* lineCountArg
 	
 	//basically, char** result now is char result[MAX_CRON_TASKS][maxStringSize];
 	
-	for(i = 0; i < MAX_CRON_TASKS; i++) {
+	for(int i = 0; i < MAX_CRON_TASKS; i++) {
 		strcpy(result[i], "");
 	}
 

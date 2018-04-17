@@ -1,6 +1,6 @@
 CC = gcc -std=c11
 objects = helpers.o taskfileparse.o logger.o daemon.o main.o
-CFLAGS = -Wall -g -lm
+CFLAGS = -g -lm
 name = minicron
 
 $(name): $(objects)
