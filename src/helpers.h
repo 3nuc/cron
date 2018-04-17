@@ -21,11 +21,13 @@ int currentSecond();
 
 int str2int(char* str);
 
+char* removeEdgeSpaces(char* string);
+
 struct TASKFILE_LINE parseTaskfileLine(char* line);
 
 int stringContainsCharacter(char* string, char character);
 
-char** splitByPipe(char* string, int* numberOfCommandsArg);
+char** splitByCharacter(char* string, int* numberOfCommandsArg, char splittingCharacter);
 
 void printTask(struct TASKFILE_LINE task);
 

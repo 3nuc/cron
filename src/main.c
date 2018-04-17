@@ -3,34 +3,81 @@
 #include "daemon.h"
 #include <stdio.h>
 
-char** commandToPieces(char* cmd) {
-	int spaces = 0, i;
-	for( i = 0; i < strlen(cmd); i++) {
-		if(cmd[i] == ' ') spaces++;
-	}
+void handleCommand(char* commandString) {
 
-	char** result = malloc(sizeof(char*)*(spaces+2));
-	for( i = 0; i < spaces+2; i++) {
-		result[i] = malloc(100);
-	}
+	if(stringContainsCharacter(commandString,'|')) { //if command is like 'program1 | program2'
+		int* numberOfPipedCommands=malloc(sizeof *numberOfPipedCommands);
+		char** commands = splitByCharacter(commandString, numberOfPipedCommands, '|');
 
-	int j = 0, c = 0;
-	for( i = 0; i < strlen(cmd); i++) {
-		if(cmd[i] == ' ') {
-			result[j][c] = '\0';
-			c = 0;
-			j++;
+		int fds[*numberOfPipedCommands * 2];	// pipes
+		for( i = 0; i < *numberOfPipedCommands; i++) {
+			if(pipe(fds + i*2) < 0) {
+				syslog(LOG_ERR, "Failed creating a pipe");
+				exit(EXIT_FAILURE);
+			}
 		}
-		else {
-			result[j][c] = cmd[i];
-			c++;
+
+		char buff[4096];
+		
+		int* commandArgc;
+		char** commandArgv;
+		for(int j = 0; j<*numberOfPipedCommands; j++) {
+			int* commandArgc=malloc(sizeof *commandArgc);
+			char** commandArgv = splitByCharacter(removeEdgeSpaces(commands[j]), commandArgc, ' ');
+			
+			for(int k = 0; k < *commandArgc; k++) {
+				printf("	|%s|\n", commandArgv[k]);
+				//the above printf prints arguments (the same format as argv[]) of a command.
+				//so "cd -d -xd" will print "cd", "-d" "-xd".
+			}
+
+			printf("\n");
+
+		}
+
+		free(commandArgc);
+		free(commandArgv);
+		free(commands);
+		free(numberOfPipedCommands);
+
+		for( i = 0; i < *numberOfPipedCommands*2; i++) {
+			close(fds[i]);
 		}
 	}
-	result[j][c] = '\0';
-	result[j+1] = 0;
-
-	return result;
+	
+	else {  //for normal commands (without pipe)
+		printf("%s\n", commandString);
+		/*createWholesomeFork(commandString)*/
+	};
 }
+// char** commandToPieces(char* cmd) {
+// 	int spaces = 0, i;
+// 	for( i = 0; i < strlen(cmd); i++) {
+// 		if(cmd[i] == ' ') spaces++;
+// 	}
+
+// 	char** result = malloc(sizeof(char*)*(spaces+2));
+// 	for( i = 0; i < spaces+2; i++) {
+// 		result[i] = malloc(100);
+// 	}
+
+// 	int j = 0, c = 0;
+// 	for( i = 0; i < strlen(cmd); i++) {
+// 		if(cmd[i] == ' ') {
+// 			result[j][c] = '\0';
+// 			c = 0;
+// 			j++;
+// 		}
+// 		else {
+// 			result[j][c] = cmd[i];
+// 			c++;
+// 		}
+// 	}
+// 	result[j][c] = '\0';
+// 	result[j+1] = 0;
+
+// 	return result;
+// }
 
 void handleCommand(char* commandString, int outtype) {
 

@@ -4,10 +4,10 @@
 
 struct TASKFILE_LINE *getTaskArray(char* pathToTaskfile, int* lineCountArg) {
 	struct TASKFILE_LINE *result;
-	int* linecountptr;
+	int* linecountptr=malloc(sizeof(*linecountptr));
 	
 	char* taskfileContentsAsOneString = _getTaskfileContentsAsLineString(pathToTaskfile);
-	char** linesFromTaskfile = _convertLineStringIntoLineArray(taskfileContentsAsOneString, linecountptr);
+	char** linesFromTaskfile = _convertLineStringIntoLineArray(taskfileContentsAsOneString,linecountptr);
 	
 	free(taskfileContentsAsOneString);
 	
@@ -18,11 +18,12 @@ struct TASKFILE_LINE *getTaskArray(char* pathToTaskfile, int* lineCountArg) {
 	int parsingLessLinesThanMAXCRONTASKSAllows=numberOfLines<MAX_CRON_TASKS;
 	assert(parsingLessLinesThanMAXCRONTASKSAllows);
 	
-	int i;
-	for(i = 0; i < numberOfLines;i++) {
+	for(int i = 0; i <= numberOfLines;i++) {
 		result[i]=parseTaskfileLine(linesFromTaskfile[i]);
 	}
 	*lineCountArg=numberOfLines;
+	
+	qsort(result,numberOfLines,sizeof(struct TASKFILE_LINE), _compareForQsort);
 	return result;
 }
 
@@ -54,8 +55,7 @@ char** _convertLineStringIntoLineArray(char* reallyLongString, int* lineCountArg
 	
 	char** result=malloc( MAX_CRON_TASKS*sizeof( char* ));
 	
-	int i;
-	for (i = 0; i < MAX_CRON_TASKS; i++) {
+	for (int i = 0; i < MAX_CRON_TASKS; i++) {
 		result[i]=malloc(maxStringSize);
 	}
 	
@@ -73,7 +73,7 @@ char** _convertLineStringIntoLineArray(char* reallyLongString, int* lineCountArg
 
 	//printf("\nconv strlen %d\n", stringLength);
 	
-	for(i = 0; i < stringLength; i++) {
+	for(int i = 0; i < stringLength; i++) {
 	//	printf("conv %d\n", i);
 		char currentCharacter = reallyLongString[i];
 		if(currentCharacter=='\n') {
@@ -95,3 +95,21 @@ char** _convertLineStringIntoLineArray(char* reallyLongString, int* lineCountArg
 	*lineCountArg=lineCount;
 	return result;
 }
+
+int _compareForQsort(const void * a, const void *  b) {
+	struct TASKFILE_LINE *elemA = (struct TASKFILE_LINE*) a;
+	struct TASKFILE_LINE *elemB = (struct TASKFILE_LINE*) b;
+	int ahour=elemA->hour;
+	int bhour=elemB->hour;
+	int aminute=elemA->minute;
+	int bminute=elemB->minute;
+	
+	if(ahour>bhour) return 1;
+	else if(ahour<bhour) return -1;
+	
+	else
+		if(aminute>bminute) return 1;
+		else if(aminute<bminute) return -1;
+		else return 0;
+}
+
