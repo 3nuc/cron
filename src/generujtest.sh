@@ -34,5 +34,9 @@ do
 done
 
 ./minicron crontaskfile.test outfile.txt
-
+printf "\n"
+cat outfile.txt
+printf "\n"
+echo ---------
+tail -n 5 /var/log/syslog
 exit
