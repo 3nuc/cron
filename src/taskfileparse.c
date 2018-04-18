@@ -1,5 +1,6 @@
 #define MAX_CRON_TASKS 100 //how many lines there can be in the taskfile
 #include "taskfileparse.h"
+#include "logger.h"
 #include <syslog.h>
 
 struct TASKFILE_LINE *getTaskArray(char* pathToTaskfile, int* lineCountArg) {
@@ -32,7 +33,6 @@ char* _getTaskfileContentsAsLineString(char* pathToTaskfile) {
 	int fileDescriptor = open(pathToTaskfile, O_RDONLY);
 	enableLogging();
 	if(fileDescriptor < 0) {
-		printf("%s","nie czyta taskfile benc");
 		syslog(LOG_ERR, "Cannot access/Missing taskfile");
 		exit(EXIT_FAILURE);
 		}
