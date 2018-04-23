@@ -35,48 +35,117 @@ void forkDaemon() {
 	syslog(LOG_NOTICE, "Mini-cron properly forked");
 }
 
-void executeCommand(char** command, int outtype) {
-	pid_t pid;
-	int fd[2];
+void handleCommand(char* commandString, const char* outPath, int outtype) {
+
+	//if(stringContainsCharacter(commandString,'|')) { //if command is like 'program1 | program2'
+	int* numberOfPipedCommands=malloc(sizeof *numberOfPipedCommands);
+	char** commands = splitByCharacter(commandString, numberOfPipedCommands, '|');
+
+	int fds[(*numberOfPipedCommands) * 2];	// pipes
+	for(int i = 0; i < *numberOfPipedCommands; i++) {
+		if(pipe(fds + i*2) < 0) {
+			syslog(LOG_ERR, "Failed creating a pipe");
+			exit(EXIT_FAILURE);
+		}
+	}
+
+	// error pipe
+	int errp[2];
+	if(pipe(errp) < 0) {
+		syslog(LOG_ERR, "Failed creating an error pipe");
+		exit(EXIT_FAILURE);
+	}
+
 	char buff[4096];
+	char bufferr[1024];// bufferr[0] = '\0';
+	int nbyteserr = 0;
+	
+	int* commandArgc;
+	char** commandArgv;
 
-	if(pipe(fd) < 0) {
-		syslog(LOG_ERR, "Failed creating a pipe for %s", command);
-		exit(EXIT_FAILURE);
-	}
+	syslog(LOG_NOTICE, "Forking command %s", commandString);
 
-	pid = fork();
+	for(int j = 0; j<*numberOfPipedCommands; j++) {
 
-	if( pid < 0 ) {
-		syslog(LOG_ERR, "Failed creating a process for the command %s", command);
-		exit(EXIT_FAILURE);
-	}
-	if( pid > 0 ) {	// parent
-
-		close(fd[1]);
-
-		int out = open("/home/maxim/studia/out", O_WRONLY | O_APPEND);
-		int nbytes = read(fd[0], buff, sizeof(buff));
-		write(out, buff, nbytes);
-
-		close(out);
-		close(fd[0]);
-		waitpid(pid, 0, 0);
-	}
-	else {	//child
-
-		close(fd[0]);
-
-		dup2(fd[1], STDOUT_FILENO);
-		syslog(LOG_NOTICE, "Forked command %s", command[0]);
-
-		char* test[2];
-		test[0] = "cat";
-		test[1] = "/home/maxim/studia/cron/README.md";
-		test[2] = 0;
+		commandArgc=malloc(sizeof *commandArgc);
+		commandArgv = splitByCharacter(removeEdgeSpaces(commands[j]), commandArgc, ' ');
 		
-		execv(command[0], command);
+		for(int k = 0; k < *commandArgc; k++) {
+			printf("	|%s|\n", commandArgv[k]);
+			//the above printf prints arguments (the same format as argv[]) of a command.
+			//so "cd -d -xd" will print "cd", "-d" "-xd".
+		}
 
-		close(fd[1]);
+		pid_t pid = fork();
+
+		if( pid < 0 ) {
+			syslog(LOG_ERR, "Failed creating a process for the command %s", commandArgv[0]);
+			exit(EXIT_FAILURE);
+		}
+		if( pid > 0 ) {	// parent
+			//waitpid(pid,0,0);
+		}
+		else {	//child
+
+			if(j != 0) {
+				dup2(fds[(j-1)*2], STDIN_FILENO);
+			}
+			
+			dup2(fds[j*2+1], STDOUT_FILENO);
+			dup2(errp[1], STDERR_FILENO); close(errp[0]); close(errp[1]);
+
+			commandArgv[*commandArgc] = 0; // null termination is required at the end of argv[] in exec
+
+			for(int i = 0; i < (*numberOfPipedCommands)*2; i++) {
+				close(fds[i]);
+			}
+
+			execvp(commandArgv[0], commandArgv);
+
+			//exec error
+			syslog(LOG_ERR, "EXEC error of command %s", commandArgv[0]);
+			exit(EXIT_FAILURE);
+		}
 	}
+
+	close(errp[1]);
+	nbyteserr = read(errp[0], bufferr, sizeof(bufferr));
+	close(errp[0]);
+
+	for(int i = 0; i < (*numberOfPipedCommands)*2; i++) {
+		if(((*numberOfPipedCommands)-1)*2 != i)
+			close(fds[i]);
+	}
+
+	int out = open(outPath, O_WRONLY | O_APPEND);
+
+	if(nbyteserr != 0)
+	{
+		bufferr[nbyteserr] = '\0';
+		syslog(LOG_ERR, "ERROR: %s", bufferr);
+		if(outtype != 0) { // 0 - tylko stdout
+			write(out, bufferr, nbyteserr);
+		}
+	}
+	else {
+		if(outtype != 1) { // 1 - tylko stderr
+			int nbytes = read(fds[((*numberOfPipedCommands)-1)*2], buff, sizeof(buff));
+			write(out, buff, nbytes);
+			syslog(LOG_NOTICE, "Fork successful: %s", commandString);
+		}
+	}
+
+	close(out);
+	close(fds[((*numberOfPipedCommands)-1)*2]);
+
+	free(commandArgc);
+	free(commandArgv);
+	free(commands);
+	free(numberOfPipedCommands);
+	// }
+	
+	// else {  //for normal commands (without pipe)
+	// 	printf("%s\n", commandString);
+	// 	/*createWholesomeFork(commandString)*/
+	// };
 }
