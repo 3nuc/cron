@@ -30,5 +30,9 @@ int stringContainsCharacter(char* string, char character);
 char** splitByCharacter(char* string, int* numberOfCommandsArg, char splittingCharacter);
 
 void printTask(struct TASKFILE_LINE task);
-
+struct TASKFILE_LINE* createPlaceholderTask(int hour, int minute, char* command, int info);
 int checkArgs(int argc, char* argv[]);
+
+void getTaskCurrentHourIndexRange(int* start, int* end, struct TASKFILE_LINE* tasks, int numberOfTasks, int* daemonSleepFor);
+
+
