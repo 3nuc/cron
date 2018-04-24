@@ -102,56 +102,31 @@ int stringContainsCharacter(char* string, char character) { //checks if argument
 	return 0;
 }
 
-void getCurrentHourTaskIndexRange(int* start, int* end, struct TASKFILE_LINE* tasks, int numberOfTasks) {
-	//the "tasks" argument in this function is supposed to be the array returned by getAllTasks()
-	//this function changes its "start" and "end" arguments to the indexes (I N D I C E S) where the tasks for the current hour begin and end
-	assert(numberOfTasks>0);
+void getTaskCurrentHourIndexRange(int* start, int* end, struct TASKFILE_LINE* tasks, int numberOfTasks, int* daemonSleepFor) {
+	const struct TASKFILE_LINE* currentTime = createPlaceholderTask(currentHour(), currentMinute(), "", 0);
+	//_compareForQsort compares only hours for tasks, so I create a dummy task with the current time above
 	
-	static int startFrom = 0; //this is static so the last "start" position is remembered between calls of this function
-
-	const int hourNow = currentHour();
-	const int minuteNow = currentMinute();
-	
-	
-	struct TASKFILE_LINE scannedTask = tasks[0];
-
-	int taskHour = scannedTask.hour;
-	int taskMinute = scannedTask.minute;
-	
-	//abandon all hope you who enter here
-	
-	//read the sentence at the beginning of this func if you didnt already
-	//you need to set "start" and/or "end" to eg. "-1" when there are no tasks for current hour here
-	//(currentTaskTime)>(currentTime)
-	//TODO./\
-	//there's a time comparison function in "taskfileparse.c", but it's for tasks.
-	//you can create a createPlaceholderTask with just the time initialized and compare scannedTask to your placeholder task
-	//ignore the below code because it's probably not working properly
-
-	scannedTask = tasks[startFrom+1];
-	taskHour = scannedTask.hour;
-	taskMinute = scannedTask.minute;
-
-	if(hourNow==taskHour && minuteNow==currentMinute) {
-		startFrom++;
+	static int rememberLastEnd = 0; //this will remember where to star the search from between function calls (the tasks[] array is sorted)
+	*start = rememberLastEnd;
+	while(_compareForQsort(currentTime, &tasks[*start]) < 0 ) { //seek until you find a task whose hour&minute is "now" or later than currenttime
+	       if(*start == numberOfTasks) {
+		       printf("Cant' find any task later than current time. Closing\n");
+		       return;
+	       }
+		*start++;
 	}
-	else *start = -1;
-
-	*end=startFrom+1;
-	
-	scannedTask = tasks[*end];
-	taskHour = scannedTask.hour;
-	taskMinute = scannedTask.minute;
-
-	while(hourNow==taskHour && minuteNow==currentMinute) {
-
-		if(*end+1 < numberOfTasks) *end++;
-		scannedTask = tasks[*end];
-		taskHour = scannedTask.hour;
-		taskMinute = scannedTask.minute;
+		*end=*start;
+	while(_compareForQsort(currentTime, &tasks[*end])==0) { //find the last place where there's a task for the current time
+		if(*end==numberOfTasks) break;
+		*end++;
 	}
-	startFrom=*end; //less searching wow
 
+	if(*end<numberOfTasks) { //check the next task and tell the daemon when to wake up next  
+ 		*daemonSleepFor = (tasks[*end].hour*60*60+tasks[*end].minute*60+(60-currentSecond())+1); //this is in seconds		
+	}
+
+	rememberLastEnd = *end;
+	free(currentTime);
 }
 
 char** splitByCharacter(char* string, int* numberOfCommandsArg,char splittingCharacter) {
