@@ -28,10 +28,6 @@ void forkDaemon() {
 		exit(EXIT_FAILURE);
 	}
 
-	//close(STDIN_FILENO);
-	//close(STDOUT_FILENO);
-	//close(STDERR_FILENO);
-
 	syslog(LOG_NOTICE, "Mini-cron properly forked");
 }
 
