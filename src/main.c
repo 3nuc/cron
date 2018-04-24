@@ -19,14 +19,17 @@ int main(int argc, char* argv[]) {
 		exit(EXIT_FAILURE);
 	}
 
-	write(out, "what\n", 5);
+	write(out, "\nUruchomiono dnia: PLSADD\n", 26);
 
 	close(out);
 
 	//printf("FeelsGoodMan with my pid %d", getpid());
-	//handleCommand("ls -l / | wc -l | wc | wc -l | wc | wc", pathToOutfile);
+	handleCommand("ls -l / | wc -l | wc | wc -l | wc | wc", pathToOutfile, 2);
+	handleCommand("ls -l /", pathToOutfile, 2);
+	handleCommand("ls -l / | wc -l", pathToOutfile, 2);
 	handleCommand("cat /XD", pathToOutfile, 2);
-	//handleCommand("cat /home/maxim/studia/cron/src/daemon.h | grep --line-buffered std", pathToOutfile);
+	handleCommand("cat /XD | grep --line-buffered std", pathToOutfile, 2);
+	handleCommand("cat /home/maxim/studia/cron/src/daemon.h | grep --line-buffered std", pathToOutfile, 2);
 	closeLogging();
 
 	return 0;
