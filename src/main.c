@@ -1,55 +1,44 @@
-#include "taskfileparse.h"
+//#include "taskfileparse.h"
+#include "logger.h"
+#include "daemon.h"
 #include <stdio.h>
 
-void handleCommand(char* commandString) {
-
-
-	if(stringContainsCharacter(commandString,'|')) { //if command is like 'program1 | program2'
-		int* numberOfPipedCommands=malloc(sizeof *numberOfPipedCommands);
-		char** commands = splitByCharacter(commandString, numberOfPipedCommands, '|');
-			
-		for(int j = 0; j<*numberOfPipedCommands; j++) {
-			int* commandArgc=malloc(sizeof *commandArgc);
-			char** commandArgv = splitByCharacter(removeEdgeSpaces(commands[j]), commandArgc, ' ');
-			
-			for(int k = 0; k < *commandArgc; k++) {
-				printf("	|%s|\n", commandArgv[k]);
-				//the above printf prints arguments (the same format as argv[]) of a command.
-				//so "cd -d -xd" will print "cd", "-d" "-xd".
-			}
-		
-			if(j==*numberOfPipedCommands-1) { //if this is the last cycle of this for loop
-				free(commandArgc);
-				free(commandArgv);
-			}
-			printf("\n");
-
-		}
-		
-		free(commands);
-		free(numberOfPipedCommands);
-	}
-	
-	else {  //for normal commands (without pipe)
-		printf("%s\n", commandString);
-		/*createWholesomeFork(commandString)*/
-	};
-}
-
 int main(int argc, char* argv[]) {
-	int argsOK = checkArgs(argc, argv);
-	if(argsOK) return argsOK;
+
+	forkDaemon();
+
+	int argsBad = checkArgs(argc, argv);
+	if(argsBad) return argsBad;
 		
 	const char* pathToTaskfile = argv[1];
 	const char* pathToOutfile = argv[2];
 
-	int* numberOfTasks=malloc(sizeof(*numberOfTasks));
-	struct TASKFILE_LINE *tasks = getTaskArray(pathToTaskfile,numberOfTasks);
-
-	for(int i = 0; i < *numberOfTasks; i++) {
-		handleCommand(tasks[i].command);
+	int out = open(pathToOutfile, O_WRONLY | O_APPEND | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+	if(out < 0) {
+		syslog(LOG_ERR, "Cannot access/create output file");
+		exit(EXIT_FAILURE);
 	}
 
+	write(out, "\nUruchomiono dnia: PLSADD\n", 26);
+
+	close(out);
+
+	//printf("FeelsGoodMan with my pid %d", getpid());
+	handleCommand("ls -l / | wc -l | wc | wc -l | wc | wc", pathToOutfile, 2);
+	handleCommand("ls -l /", pathToOutfile, 2);
+	handleCommand("ls -l / | wc -l", pathToOutfile, 2);
+	handleCommand("cat /XD", pathToOutfile, 2);
+	handleCommand("cat /XD | grep --line-buffered std", pathToOutfile, 2);
+	handleCommand("cat /home/maxim/studia/cron/src/daemon.h | grep --line-buffered std", pathToOutfile, 2);
+	closeLogging();
 
 	return 0;
+
+	// int* numberOfTasks=malloc(sizeof(*numberOfTasks));
+	// struct TASKFILE_LINE *tasks = getTaskArray(pathToTaskfile,numberOfTasks);
+
+	// for(int i = 0; i < *numberOfTasks; i++) {
+	// 	handleCommand(tasks[i].command);
+	// }
+	// return 0;
 }

@@ -21,9 +21,9 @@ int currentSecond() { //return current second
 int str2int(char* str) { //turn a "str"ing representing a number (eg "24") and turn it into an int ("24"->24).
 	int stringLength = strlen(str);
 	int multiply = pow(10.0,(float) stringLength-1);
-	int result=0;
+	int result=0, i;
 	
-	for(int i = 0; i < stringLength; i++) {
+	for(i = 0; i < stringLength; i++) {
 		int translatedNumberFromASCII = str[i]-48;
 		int charIsDigit = translatedNumberFromASCII >= 0 && translatedNumberFromASCII <=9;
 		
@@ -40,11 +40,12 @@ int str2int(char* str) { //turn a "str"ing representing a number (eg "24") and t
 char* strcut(char* start, char* end) { //return characters between pointers "start" and "end" as string
 	const int stringLength = end-start;
 	char* tab = malloc(sizeof(char)*100); //memory leak call the cops
-	
-	for(int i = 0; i < stringLength; i++) {
+
+	int i;
+	for(i = 0; i < stringLength; i++) {
 		tab[i]=*(start+i);
 	}
-	tab[stringLength+1]='\0'; //add string terminator to the end of our newly created string
+	tab[stringLength]='\0'; //add string terminator to the end of our newly created string
 
 	return tab;
 }
@@ -53,7 +54,7 @@ struct TASKFILE_LINE parseTaskfileLine(char* line) {//takes a "line" (a string) 
 	
 	const int stringLength = strlen(line);
 	int colonPositionsInString[] = {-1, -1, -1};
-	int colonCounter=0;
+	int colonCounter=0, i;
 
 	for(int i = 0; i < stringLength; i++) { //save the respective colon (":") positions from the string in an array
 		if(line[i] == ':') {
@@ -92,7 +93,7 @@ struct TASKFILE_LINE parseTaskfileLine(char* line) {//takes a "line" (a string) 
 }
 
 int stringContainsCharacter(char* string, char character) { //checks if argument "string" contains given "character"
-	int stringLength = sizeof(string)+1;
+	int stringLength = strlen(string);
 
 	for(int i = 0; i < stringLength; i++)
 		if(string[i]==character) 
@@ -158,7 +159,7 @@ char** splitByCharacter(char* string, int* numberOfCommandsArg,char splittingCha
 	//memory alloc stuff
 	int numberOfPipes = 0;
 	
-	for(int i = 0; i < sizeof(string)+1;i++)
+	for(int i = 0; i < strlen(string);i++)
 		if(string[i]==splittingCharacter)
 			numberOfPipes++;
 	
@@ -229,10 +230,11 @@ struct TASKFILE_LINE* createPlaceholderTask(int hour, int minute, char* command,
 
 char* removeEdgeSpaces(char* string) {	//removes chains of spaces from the left and the right ("   string   " -> "string")
 	char* start = string;
-	char* end = start+strlen(string)-1;
+	char* end = start+strlen(string)-1;// printf("END: %c\n", *end);
 
 	while(*(start++)==' '); //you think Linus would hire me?	
 	while(*(end--)==' ');
+	//*(end+2) = '\0';
 
 	return strcut(--start, end+2); //this func will have weird behavior if the given string is all spaces
 }

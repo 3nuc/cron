@@ -23,4 +23,20 @@ do
 	echo "$hourminute$i$colon$myrand$newline" >> crontaskfile.test
 done
 
+
+hourminute=$(date +%H:%M:) 
+
+
+for i in "${arr[@]}"
+do
+	myrand=$(($RANDOM % 3))
+	echo "$hourminute$i$colon$myrand$newline" >> crontaskfile.test
+done
+
 ./minicron crontaskfile.test outfile.txt
+printf "\n"
+cat outfile.txt
+printf "\n"
+echo ---------
+tail -n 5 /var/log/syslog
+exit
