@@ -12,6 +12,10 @@ int main(int argc, char* argv[]) {
 		
 	const char* pathToTaskfile = argv[1];
 	const char* pathToOutfile = argv[2];
+	int* numberOfTasks=malloc(sizeof(*numberOfTasks));
+	*numberOfTasks = 0;
+	struct TASKFILE_LINE* tasks = getTaskArray(pathToTaskfile, numberOfTasks);
+	printf("tasks loaded\n");
 
 	int out = open(pathToOutfile, O_WRONLY | O_APPEND | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 	if(out < 0) {
@@ -20,10 +24,28 @@ int main(int argc, char* argv[]) {
 	}
 
 	write(out, "\nUruchomiono dnia: PLSADD\n", 26);
-
 	close(out);
+	
+	printf("Initializing malloc vars\n");
+	int *startArr = malloc(sizeof (*startArr));
+	int *endArr = malloc(sizeof (*endArr));
+	int *sleepFor = malloc(sizeof (*sleepFor));
+	
+	printf("Malloc done, now init to 0\n");
+	*startArr = 0;
+	*endArr = 0;
+	*sleepFor=0;
 
-	//printf("FeelsGoodMan with my pid %d", getpid());
+	printf("Running func ... \n");
+	
+	getTaskCurrentHourIndexRange(startArr, endArr, tasks, *numberOfTasks, sleepFor);
+	
+	free(startArr);
+	free(endArr);
+	free(slepFor);
+	
+	
+	printf("%d %d tasks:%d", *startArr, *endArr,*numberOfTasks);
 	handleCommand("ls -l / | wc -l | wc | wc -l | wc | wc", pathToOutfile, 2);
 	handleCommand("ls -l /", pathToOutfile, 2);
 	handleCommand("ls -l / | wc -l", pathToOutfile, 2);
@@ -33,12 +55,4 @@ int main(int argc, char* argv[]) {
 	closeLogging();
 
 	return 0;
-
-	// int* numberOfTasks=malloc(sizeof(*numberOfTasks));
-	// struct TASKFILE_LINE *tasks = getTaskArray(pathToTaskfile,numberOfTasks);
-
-	// for(int i = 0; i < *numberOfTasks; i++) {
-	// 	handleCommand(tasks[i].command);
-	// }
-	// return 0;
 }

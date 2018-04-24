@@ -6,6 +6,9 @@
 #include <stdio.h>
 #include <errno.h>
 
+#ifndef HELPERS_H
+#define HELPERS_H
+
 struct TASKFILE_LINE {
 	int hour;
 	int minute;
@@ -35,4 +38,4 @@ int checkArgs(int argc, char* argv[]);
 
 void getTaskCurrentHourIndexRange(int* start, int* end, struct TASKFILE_LINE* tasks, int numberOfTasks, int* daemonSleepFor);
 
-
+#endif

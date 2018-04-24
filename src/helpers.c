@@ -1,4 +1,5 @@
 #include "helpers.h"
+#include "taskfileparse.h"
 
 int currentHour() {//return current hour
 	time_t now = time(NULL);
@@ -108,7 +109,9 @@ void getTaskCurrentHourIndexRange(int* start, int* end, struct TASKFILE_LINE* ta
 	
 	static int rememberLastEnd = 0; //this will remember where to star the search from between function calls (the tasks[] array is sorted)
 	*start = rememberLastEnd;
+	printf("all good friend, start:%d",*start);
 	while(_compareForQsort(currentTime, &tasks[*start]) < 0 ) { //seek until you find a task whose hour&minute is "now" or later than currenttime
+		printf("	start:%d",*start);
 	       if(*start == numberOfTasks) {
 		       printf("Cant' find any task later than current time. Closing\n");
 		       return;
@@ -116,6 +119,8 @@ void getTaskCurrentHourIndexRange(int* start, int* end, struct TASKFILE_LINE* ta
 		*start++;
 	}
 		*end=*start;
+
+		printf("second while pogchamp");
 	while(_compareForQsort(currentTime, &tasks[*end])==0) { //find the last place where there's a task for the current time
 		if(*end==numberOfTasks) break;
 		*end++;

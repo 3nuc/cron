@@ -33,10 +33,11 @@ do
 	echo "$hourminute$i$colon$myrand$newline" >> crontaskfile.test
 done
 
-./minicron crontaskfile.test outfile.txt
+coolpath=/home/artur/dev/cron/src/
+./minicron $coolpath/crontaskfile.test $coolpath/outfile.txt
 printf "\n"
 cat outfile.txt
 printf "\n"
 echo ---------
-tail -n 5 /var/log/syslog
+tail -n 15 /var/log/syslog
 exit
