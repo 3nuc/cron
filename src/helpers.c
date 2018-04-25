@@ -119,7 +119,7 @@ void getTaskCurrentHourIndexRange(int* start, int* end, struct TASKFILE_LINE* ta
 	while(_compareForQsort(currentTime, &tasks[*start]) != 0 ) { //seek until you find a task whose hour&minute is "now" or later than currenttime
 		printf("	start:%d\n",*start);
 	       if(*start == numberOfTasks) {
-		printf("All scheduled tasks already completed OR cron started after they were scheduled. Nothing to do. Closing");
+		printf("All scheduled tasks already completed OR cron started after they were scheduled. Nothing to do. Closing.\n");
 		       return;
 	       }
 		(*start)++;
