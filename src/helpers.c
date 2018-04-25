@@ -109,25 +109,36 @@ void getTaskCurrentHourIndexRange(int* start, int* end, struct TASKFILE_LINE* ta
 	
 	static int rememberLastEnd = 0; //this will remember where to star the search from between function calls (the tasks[] array is sorted)
 	*start = rememberLastEnd;
-	printf("all good friend, start:%d",*start);
-	while(_compareForQsort(currentTime, &tasks[*start]) < 0 ) { //seek until you find a task whose hour&minute is "now" or later than currenttime
-		printf("	start:%d",*start);
+	printf("	all good friend, start:%d\n",*start);
+	
+	fflush(stdout);
+	printf("check first comparison: %d\n", _compareForQsort(currentTime, &tasks[*start]));
+	printf("check while condition: %d\n", _compareForQsort(currentTime, &tasks[*start]) < 0);
+	printTask(*currentTime);
+	printTask(tasks[*start]);
+	while(_compareForQsort(currentTime, &tasks[*start]) != 0 ) { //seek until you find a task whose hour&minute is "now" or later than currenttime
+		printf("	start:%d\n",*start);
 	       if(*start == numberOfTasks) {
-		       printf("Cant' find any task later than current time. Closing\n");
+		printf("All scheduled tasks already completed OR cron started after they were scheduled. Nothing to do. Closing");
 		       return;
 	       }
-		*start++;
+		(*start)++;
 	}
 		*end=*start;
 
-		printf("second while pogchamp");
 	while(_compareForQsort(currentTime, &tasks[*end])==0) { //find the last place where there's a task for the current time
+		printf("	adding end: %d\n", *end);
 		if(*end==numberOfTasks) break;
-		*end++;
+		(*end)++;
 	}
 
+	printf("Finally, end is: %d\n", *end);
+
+	printf("Sleep formula debug:\n Supposedly the next task is:\n");
+	printTask(tasks[*end]);
+	printf("The current time is: %d:%d:%d\n", currentHour(), currentMinute(), currentSecond());	
 	if(*end<numberOfTasks) { //check the next task and tell the daemon when to wake up next  
- 		*daemonSleepFor = (tasks[*end].hour*60*60+tasks[*end].minute*60+(60-currentSecond())+1); //this is in seconds		
+ 		*daemonSleepFor = ((tasks[*end].hour-currentTime->hour)*60*60+(tasks[*end].minute-currentTime->minute)*60-currentSecond()+1); //this is in seconds		
 	}
 
 	rememberLastEnd = *end;

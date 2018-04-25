@@ -22,8 +22,12 @@ struct TASKFILE_LINE *getTaskArray(char* pathToTaskfile, int* lineCountArg) {
 	for(int i = 0; i <= numberOfLines;i++) {
 		result[i]=parseTaskfileLine(linesFromTaskfile[i]);
 	}
+	for(int i =0; i < MAX_CRON_TASKS; i++) {
+		free(linesFromTaskfile[i]);
+	}
 	*lineCountArg=numberOfLines;
-	
+
+
 	qsort(result,numberOfLines,sizeof(struct TASKFILE_LINE), _compareForQsort);
 	return result;
 }
