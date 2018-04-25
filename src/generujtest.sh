@@ -7,6 +7,8 @@ set -e
 
 make -s
 rm -f crontaskfile.test
+rm -f outfile.txt
+touch outfile.txt
 
 declare -a arr=("date +%y/%m"
 		"date +%y/%m/%d | echo pipe!"
