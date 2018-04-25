@@ -36,8 +36,14 @@ int main(int argc, char* argv[]) {
 	
 
 	printf("Running func ... \n");
-	
-	getTaskCurrentHourIndexRange(startArr, endArr, tasks, *numberOfTasks, sleepFor);
+	while(*startArr!=*numberOfTasks) { //this is the main loop, it will stop once there are no more tasks to be executed
+		getTaskCurrentHourIndexRange(startArr, endArr, tasks, *numberOfTasks, sleepFor);
+		for(int i = *startArr; i < *endArr; i++) {
+			//handle sigusr1 here
+			handleCommand(tasks[i].command, pathToOutfile, tasks[i].info);
+		}
+		sleep(*sleepFor);
+	}
 	
 	printf("%d %d sleepfor:%d tasks:%d\n", *startArr, *endArr,*sleepFor,*numberOfTasks);
 	closeLogging();
